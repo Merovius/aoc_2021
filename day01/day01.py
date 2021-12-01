@@ -1,19 +1,7 @@
-file = open('input.txt', 'r')
-lines = file.readlines()
+data = [int(l) for l in open('input.txt', 'r').readlines()]
+#data = [199,200,208,210,200,207,240,269,260,263]
 
-#lines = ["199", "200", "208", "210", "200", "207", "240", "269", "260", "263"]
-
-lines = [int(l) for l in lines]
-
-count = 0
-for i in range(len(lines)-1):
-    if lines[i] < lines[i+1]:
-        count += 1
+count = sum(1 if w[0] < w[1] else 0 for w in zip(data, data[1:]))
 print("Number of increases:", count)
-
-windows = [lines[i-1]+lines[i]+lines[i+1] for i in range(1, len(lines)-1)]
-count = 0
-for i in range(len(windows)-1):
-    if windows[i] < windows[i+1]:
-        count += 1
+count = sum(1 if w[0] < w[1] else 0 for w in zip(data, data[3:]))
 print("Number of windowed increases:", count)
