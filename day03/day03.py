@@ -19,7 +19,7 @@ for i in range(len(ones)):
         gamma += 1
     else:
         epsilon += 1
-print(f'γ: {gamma}, ε: {epsilon}, γ•ε: {gamma*epsilon}')
+print(f'γ: {gamma:b}={gamma}, ε: {epsilon:b}={epsilon}, γ•ε: {gamma*epsilon}')
 
 def most_common_bit(lines, i):
     n = 0
