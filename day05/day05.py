@@ -1,6 +1,10 @@
 from re import fullmatch
 from collections import defaultdict
 
+def readfile(name):
+    with open(name, 'r') as file:
+        return file.readlines()
+
 def parse(name):
     def parse_pt(s):
         xs, ys = map(int, s.split(","))
@@ -10,8 +14,7 @@ def parse(name):
         start, end = map(parse_pt, s.split(" -> "))
         return (start, end)
 
-    lines = open(name).readlines()
-    return [parse_line(l) for l in lines]
+    return list(map(parse_line, readfile(name)))
 
 def print_hits(hits):
     max_x, max_y = 0, 0
@@ -25,11 +28,6 @@ def print_hits(hits):
             else:
                 print(str(hits[(x,y)]), end='')
         print('')
-
-def sign(n):
-    if n<0:
-        return -1
-    return int(n>0)
 
 def calculate_hits(lines, skip_diagonals=True):
     def sign(n):

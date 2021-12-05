@@ -1,6 +1,10 @@
 from functools import reduce
 
-data = open('input.txt', 'r').readlines()
+def readfile(name):
+    with open(name, 'r') as file:
+        return file.readlines()
+
+data = readfile('input.txt')
 #data = ["forward 5", "down 5", "forward 8", "up 3", "down 8", "forward 2"]
 
 def apply_commands_part1(cmds):

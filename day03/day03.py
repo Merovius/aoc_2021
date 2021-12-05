@@ -1,7 +1,11 @@
 from collections import defaultdict
 from itertools import filterfalse
 
-data = [l.strip() for l in open('input.txt').readlines()]
+def readfile(name):
+    with open(name, 'r') as file:
+        return file.readlines()
+
+data = [l.strip() for l in readfile('input.txt')]
 #data = ['00100','11110','10110','10111','10101','01111','00111','11100','10000','11001','00010','01010']
 
 total = 0

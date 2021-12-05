@@ -1,5 +1,9 @@
 from collections import namedtuple
 
+def readfile(name):
+    with open(name, 'r') as file:
+        return file.readlines()
+
 class Board:
     def __init__(self, board):
         self._board = board
@@ -43,17 +47,16 @@ class Board:
 Data = namedtuple('Data', ['draw', 'boards'])
 
 def read_data(name):
-    with open(name, 'r') as file:
-        lines = file.readlines()
-        draw = [int(l) for l in lines[0].split(',')]
-        boards = []
+    lines = readfile(name)
+    draw = [int(l) for l in lines[0].split(',')]
+    boards = []
 
-        lines = lines[1:]
-        for i in range(0, len(lines), 6):
-            block = lines[i+1:i+6]
-            boards.append(Board([[int(x) for x in l.split()] for l in block]))
+    lines = lines[1:]
+    for i in range(0, len(lines), 6):
+        block = lines[i+1:i+6]
+        boards.append(Board([[int(x) for x in l.split()] for l in block]))
 
-        return Data(draw, boards)
+    return Data(draw, boards)
 
 def find_winners(data):
     winners = []
