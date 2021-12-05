@@ -2,9 +2,16 @@ from re import fullmatch
 from collections import defaultdict
 
 def parse(name):
+    def parse_pt(s):
+        xs, ys = map(int, s.split(","))
+        return (xs, ys)
+
+    def parse_line(s):
+        start, end = map(parse_pt, s.split(" -> "))
+        return (start, end)
+
     lines = open(name).readlines()
-    groups = [fullmatch('(\d+),(\d+) -> (\d+),(\d+)', l.strip()).groups() for l in lines]
-    return [((int(g[0]), int(g[1])),(int(g[2]),int(g[3]))) for g in groups]
+    return [parse_line(l) for l in lines]
 
 def print_hits(hits):
     max_x, max_y = 0, 0
