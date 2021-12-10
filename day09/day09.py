@@ -1,4 +1,5 @@
-from collections import defaultdict
+from functools import reduce
+from operator import mul
 
 def read(name):
     with open(name, 'r') as file:
@@ -10,52 +11,48 @@ class Point(tuple):
     def __new__(self, r, c):
         return tuple.__new__(Point, (r, c))
 
-    def __add__(self, other):
-        return Point(self[0]+other[0], self[1]+other[1])
-
     @property
     def val(self):
-        return get(self[0], self[1])
+        return data[self[0]][self[1]]
 
-def get(r, c):
-    if r < 0 or r >= len(data):
-        return 10
-    if c < 0 or c >= len(data[r]):
-        return 10
-    return data[r][c]
+    @property
+    def neighbors(self):
+        r, c = self
+        if r > 0:
+            yield Point(r-1, c)
+        if r < len(data)-1:
+            yield Point(r+1, c)
+        if c > 0:
+            yield Point(r, c-1)
+        if c < len(data[r])-1:
+            yield Point(r, c+1)
 
-def risk_level(data):
-    rl = 0
+def points():
     for r in range(len(data)):
         for c in range(len(data[r])):
-            h = get(r, c)
-            if h < get(r-1, c) and h < get(r+1,c) and h < get(r, c-1) and h < get(r, c+1):
-                rl += 1+h
-    return rl
+            yield Point(r, c)
+
+def risk_level(data):
+    return sum(1+p.val for p in points() if all(p.val < q.val for q in p.neighbors))
 
 def basin_sizes(data):
     labels = {}
-    n = 0
-    def dfs(p):
+    sizes = []
+    def dfs(p, label=None):
         if p in labels or p.val >= 9:
             return
-        labels[p] = n
-        for q in [(-1,0), (1,0), (0,-1), (0,1)]:
-            dfs(p+q)
+        if label is None:
+            label = len(sizes)
+            sizes.append(0)
+        labels[p] = label
+        sizes[label] += 1
+        for q in p.neighbors:
+            dfs(q, label)
 
-    for r in range(len(data)):
-        for c in range(len(data[r])):
-            p = Point(r, c)
-            if p in labels or p.val >= 9:
-                continue
-            dfs(p)
-            n += 1
+    for p in points():
+        dfs(p)
 
-    sizes = [0]*n
-    for l in labels.values():
-        sizes[l] += 1
-    sizes.sort()
-    return sizes[-1]*sizes[-2]*sizes[-3]
+    return reduce(mul, sorted(sizes)[-3:])
 
 print(f"Risk level: {risk_level(data)}")
 print(f"Product of largest basin sizes: {basin_sizes(data)}")
