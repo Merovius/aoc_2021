@@ -12,9 +12,7 @@ use simple_error::SimpleError;
 fn main() -> Result<(), Box<dyn Error>> {
     let lines = BufReader::new(File::open("day05/example.txt")?)
         .lines()
-        .collect::<Result<Vec<_>, _>>()?
-        .into_iter()
-        .map(|s| s.parse::<Line>())
+        .map(|s| s?.parse::<Line>())
         .collect::<Result<Vec<_>, _>>()?;
     let max = (&lines).into_iter().flatten().reduce(Point::max).unwrap() + Point(1, 1);
     let mut grid = Array2D::filled_with(0, max.0 as usize, max.1 as usize);
@@ -25,7 +23,31 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 
-    print_grid(&grid);
+    let mut total = 0u64;
+    for row in grid.rows_iter() {
+        for v in row {
+            if *v > 1 {
+                total += 1;
+            }
+        }
+    }
+    println!("Total number of intersections: {}", total);
+
+    for l in (&lines).into_iter().filter(|l| !l.is_aligned()) {
+        for p in l {
+            grid[p] += 1;
+        }
+    }
+    total = 0;
+    for row in grid.rows_iter() {
+        for v in row {
+            if *v > 1 {
+                total += 1;
+            }
+        }
+    }
+    println!("Total number of intersections: {}", total);
+
     Ok(())
 }
 
@@ -55,14 +77,14 @@ impl Point {
 }
 
 impl FromStr for Point {
-    type Err = SimpleError;
-    fn from_str(s: &str) -> Result<Point, SimpleError> {
+    type Err = Box<dyn Error>;
+    fn from_str(s: &str) -> Result<Point, Self::Err> {
         let coords: Result<Vec<_>, _> = s.split(",").map(|s| s.parse::<usize>()).collect();
         match coords {
-            Err(e) => Err(SimpleError::from(e)),
+            Err(e) => Err(Box::new(SimpleError::from(e))),
             Ok(v) => match v[..] {
                 [a, b] => Ok(Point(a as isize, b as isize)),
-                _ => Err(SimpleError::new("wrong number of coordinates")),
+                _ => Err(Box::new(SimpleError::new("wrong number of coordinates"))),
             },
         }
     }
@@ -132,18 +154,32 @@ impl Line {
 }
 
 impl FromStr for Line {
-    type Err = SimpleError;
-    fn from_str(s: &str) -> Result<Line, SimpleError> {
+    type Err = Box<dyn Error>;
+    fn from_str(s: &str) -> Result<Line, Self::Err> {
         let points: Result<Vec<_>, _> = s.split(" -> ").map(|s| s.parse::<Point>()).collect();
         match points {
-            Err(e) => Err(SimpleError::from(e)),
+            Err(e) => Err(e),
             Ok(v) => match v[..] {
                 [from, to] => match Line::make_safely(from, to) {
-                    None => Err(SimpleError::new("line is not straight")),
+                    None => Err(Box::new(SimpleError::new("line is not straight"))),
                     Some(l) => Ok(l),
                 },
-                _ => Err(SimpleError::new("wrong number of coordinates")),
+                _ => Err(Box::new(SimpleError::new("wrong number of coordinates"))),
             },
+        }
+    }
+}
+
+impl IntoIterator for Line {
+    type Item = Point;
+    type IntoIter = LineIter;
+
+    fn into_iter(self) -> LineIter {
+        let step = (self.to - self.from).normalize();
+        LineIter {
+            pt: self.from,
+            end: self.to + step,
+            step: step,
         }
     }
 }
