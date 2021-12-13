@@ -1,13 +1,16 @@
-use std::collections::HashSet;
-use std::io::{BufRead,BufReader};
-use std::fs::File;
 use simple_error::SimpleError;
+use std::collections::HashSet;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 
 type Error = Box<dyn std::error::Error>;
 
 fn main() -> Result<(), Error> {
     let (mut points, folds) = parse("day13/input.txt")?;
-    println!("After first fold, there are {} points.", set_apply(&points, folds[0]).len());
+    println!(
+        "After first fold, there are {} points.",
+        set_apply(&points, folds[0]).len()
+    );
     for f in folds {
         points = set_apply(&points, f);
     }
@@ -27,7 +30,7 @@ fn print_set(points: &HashSet<Point>) {
     let maxy = points.into_iter().map(|p| p.1).max().unwrap();
     for y in miny..=maxy {
         for x in minx..=maxx {
-            if points.contains(&Point(x,y)) {
+            if points.contains(&Point(x, y)) {
                 print!("•");
             } else {
                 print!(" ");
@@ -37,7 +40,7 @@ fn print_set(points: &HashSet<Point>) {
     }
 }
 
-#[derive(Clone,Copy,Debug)]
+#[derive(Clone, Copy, Debug)]
 enum Fold {
     X(i64),
     Y(i64),
@@ -51,15 +54,13 @@ impl std::str::FromStr for Fold {
             Some(s) => {
                 let result: Vec<_> = s.split("=").collect();
                 match result[..] {
-                   [s, v] => {
-                       match s {
-                           "x" => Ok(Fold::X(i64::from_str(v)?)),
-                           "y" => Ok(Fold::Y(i64::from_str(v)?)),
-                           _ => Err(Box::new(SimpleError::new("invalid fold instruction"))),
-                       }
-                   },
-                   _ => Err(Box::new(SimpleError::new("invalid fold instruction"))),
-               }
+                    [s, v] => match s {
+                        "x" => Ok(Fold::X(i64::from_str(v)?)),
+                        "y" => Ok(Fold::Y(i64::from_str(v)?)),
+                        _ => Err(Box::new(SimpleError::new("invalid fold instruction"))),
+                    },
+                    _ => Err(Box::new(SimpleError::new("invalid fold instruction"))),
+                }
             }
         }
     }
@@ -68,15 +69,14 @@ impl std::str::FromStr for Fold {
 impl Fold {
     fn apply(&self, p: Point) -> Point {
         match *self {
-            Fold::X(v) => Point(if p.0 < v { p.0 } else { 2*v - p.0 }, p.1),
-            Fold::Y(v) => Point(p.0, if p.1 < v { p.1 } else { 2*v - p.1 }),
+            Fold::X(v) => Point(if p.0 < v { p.0 } else { 2 * v - p.0 }, p.1),
+            Fold::Y(v) => Point(p.0, if p.1 < v { p.1 } else { 2 * v - p.1 }),
         }
     }
 }
 
-
-#[derive(Clone,Copy,Debug,Eq,Hash,PartialEq)]
-struct Point (i64, i64);
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+struct Point(i64, i64);
 
 impl std::str::FromStr for Point {
     type Err = Error;
@@ -85,7 +85,7 @@ impl std::str::FromStr for Point {
         match result {
             Err(e) => Err(Box::new(e)),
             Ok(vec) => match vec[..] {
-                [x, y] => Ok(Point(x,y)),
+                [x, y] => Ok(Point(x, y)),
                 _ => Err(Box::new(SimpleError::new("wrong number of coordinates"))),
             },
         }
