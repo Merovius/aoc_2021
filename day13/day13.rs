@@ -1,12 +1,18 @@
-use simple_error::SimpleError;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
+use clap::{App, Arg};
+use simple_error::SimpleError;
+
 type Error = Box<dyn std::error::Error>;
 
 fn main() -> Result<(), Error> {
-    let (mut points, folds) = parse("day13/input.txt")?;
+    let matches = App::new("day13")
+        .arg(Arg::with_name("file").index(1).required(true))
+        .get_matches();
+
+    let (mut points, folds) = parse(matches.value_of("file").unwrap())?;
     println!(
         "After first fold, there are {} points.",
         set_apply(&points, folds[0]).len()

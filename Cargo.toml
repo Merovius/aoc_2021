@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 array2d = "0.2.1"
+clap = "2.34.0"
 simple-error = "0.2.3"
 
 [[bin]]
