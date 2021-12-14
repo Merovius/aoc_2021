@@ -48,7 +48,7 @@ class Counts:
 counts = Counts(tpl, rules)
 for i in range(10):
     counts.step()
-print(f"After 10 iteratiorns, the difference between most and least common element is {counts.score()}")
+print(f"After 10 steps, the difference between most and least common element is {counts.score()}")
 for i in range(30):
     counts.step()
-print(f"After 40 iteratiorns, the difference between most and least common element is {counts.score()}")
+print(f"After 40 steps, the difference between most and least common element is {counts.score()}")
