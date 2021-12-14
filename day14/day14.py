@@ -20,9 +20,7 @@ class Counts:
     def __init__(self, tpl, rules):
         self._tpl = tpl
         self._rules = rules
-        self._counts = Counter()
-        for i in range(1, len(tpl)):
-            self._counts[tpl[i-1:i+1]] += 1
+        self._counts = Counter(p[0]+p[1] for p in zip(tpl, tpl[1:]))
 
     def score(self):
         counts = self.letter_counts()
