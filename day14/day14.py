@@ -18,7 +18,7 @@ tpl, rules = read('input.txt')
 
 class Counts:
     def __init__(self, tpl, rules):
-        self._tpl = tpl
+        self._last_letter = tpl[-1]
         self._rules = rules
         self._counts = Counter(p[0]+p[1] for p in zip(tpl, tpl[1:]))
 
@@ -30,7 +30,7 @@ class Counts:
         counts = Counter()
         for k, v in self._counts.items():
             counts.update({k[0]: v})
-        counts.update(self._tpl[-1])
+        counts.update(self._last_letter)
         return counts
 
     def step(self):
