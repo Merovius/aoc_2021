@@ -1,5 +1,5 @@
 from collections import namedtuple
-from heapq import heappop, heappush
+from queue import PriorityQueue
 import math
 
 def read(name):
@@ -42,15 +42,15 @@ class Graph:
 
     def shortest_path(self):
         # implements Dijkstra's Algorithm
-        heap = []
+        q = PriorityQueue()
         visited = dict()
         for n in self.nodes:
             if n == self.start:
-                heappush(heap, Edge(0, None, n))
+                q.put(Edge(0, None, n))
             else:
-                heappush(heap, Edge(math.inf, None, n))
-        while len(heap) > 0:
-            e = heappop(heap)
+                q.put(Edge(math.inf, None, n))
+        while not q.empty():
+            e = q.get()
             if e.dst in visited:
                 continue
             visited[e.dst] = e.src
@@ -59,7 +59,7 @@ class Graph:
             for ne in self.edges(e.dst):
                 if ne.dst in visited:
                     continue
-                heappush(heap, Edge(ne.weight+e.weight, e.dst, ne.dst))
+                q.put(Edge(ne.weight+e.weight, e.dst, ne.dst))
         path = []
         n = self.end
         while n is not None:
