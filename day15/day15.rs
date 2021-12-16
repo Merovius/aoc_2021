@@ -1,4 +1,5 @@
-use std::collections::{BinaryHeap, HashSet};
+use std::collections::BinaryHeap;
+use std::ops::{Index,IndexMut};
 
 use array2d::Array2D;
 use simple_error::SimpleError;
@@ -66,6 +67,19 @@ fn expand(grid: &Array2D<u8>) -> Array2D<u8> {
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 struct Point(usize, usize);
 
+impl<T: Clone> Index<Point> for Array2D<T> {
+    type Output = T;
+    fn index(&self, p: Point) -> &Self::Output {
+        self.index((p.0, p.1))
+    }
+}
+
+impl<T: Clone> IndexMut<Point> for Array2D<T> {
+    fn index_mut(&mut self, p: Point) -> &mut Self::Output {
+        self.index_mut((p.0, p.1))
+    }
+}
+
 struct Graph {
     grid: Array2D<u8>,
 }
@@ -98,7 +112,8 @@ impl Graph {
 
     fn shortest_path_cost(&self) -> Result<u64, Error> {
         let mut q = BinaryHeap::new();
-        let mut visited = HashSet::new();
+        let mut visited = Array2D::filled_with(false, self.grid.num_rows(), self.grid.num_columns());
+
         let start = Point(0, 0);
         let end = Point(self.grid.num_rows() - 1, self.grid.num_columns() - 1);
 
@@ -109,10 +124,10 @@ impl Graph {
                 return Ok(qe.cost);
             }
             self.for_neighbor(qe.dst, |p, w| {
-                if visited.contains(&p) {
+                if visited[p] {
                     return;
                 }
-                visited.insert(p);
+                visited[p] = true;
                 q.push(QEntry::new(qe.cost + w as u64, p));
             })
         }
@@ -143,10 +158,6 @@ impl std::cmp::PartialOrd for QEntry {
 
 impl std::cmp::Ord for QEntry {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        match self.cost.cmp(&other.cost) {
-            std::cmp::Ordering::Less => std::cmp::Ordering::Greater,
-            std::cmp::Ordering::Equal => std::cmp::Ordering::Equal,
-            std::cmp::Ordering::Greater => std::cmp::Ordering::Less,
-        }
+        self.cost.cmp(&other.cost).reverse()
     }
 }
