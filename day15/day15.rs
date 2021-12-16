@@ -113,18 +113,18 @@ impl Graph {
         let start = Point(0, 0);
         let end = Point(self.grid.num_rows() - 1, self.grid.num_columns() - 1);
 
-        q.push(QEntry::new(0, start, start));
+        q.push(QEntry::new(0, start));
         while !q.is_empty() {
             let qe = q.pop().unwrap();
-            if visited.contains(&qe.dst) {
-                continue;
-            }
-            visited.insert(qe.dst);
             if qe.dst == end {
                 return Ok(qe.cost);
             }
             self.for_neighbor(qe.dst, |p, w| {
-                q.push(QEntry::new(qe.cost + w as u64, qe.dst, p));
+                if visited.contains(&p) {
+                    return;
+                }
+                visited.insert(p);
+                q.push(QEntry::new(qe.cost + w as u64, p));
             })
         }
         Err(Box::new(SimpleError::new("no path found")))
@@ -134,15 +134,13 @@ impl Graph {
 #[derive(Debug, Eq, PartialEq)]
 struct QEntry {
     cost: u64,
-    src: Point,
     dst: Point,
 }
 
 impl QEntry {
-    fn new(cost: u64, src: Point, dst: Point) -> QEntry {
+    fn new(cost: u64, dst: Point) -> QEntry {
         QEntry {
             cost: cost,
-            src: src,
             dst: dst,
         }
     }

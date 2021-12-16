@@ -8,7 +8,7 @@ def read(name):
 
 data = read('input.txt')
 
-QEntry = namedtuple("QEntry", ["cost", "src", "dst"])
+QEntry = namedtuple("QEntry", ["cost", "node"])
 
 class Graph:
     def __init__(self, nodes):
@@ -35,21 +35,23 @@ class Graph:
         # implements Dijkstra's Algorithm
         q = PriorityQueue()
         # we are only interested in the cost, not the actual path, so we don't
-        # store where we visited a node *from*.
+        # store where we visited a node *from*. Furthermore, the edge-weight
+        # only depends on the target node, so we know that the first time we
+        # see a node, we did so following the shortest path. So we can mark it
+        # as visited as soon as we see it the first time, making sure we only
+        # queue every node at most once.
         visited = set()
 
-        q.put(QEntry(cost=0, src=None, dst=self.start))
+        q.put(QEntry(cost=0, node=self.start))
         while not q.empty():
             e = q.get()
-            if e.dst in visited:
-                continue
-            visited.add(e.dst)
-            if e.dst == self.end:
+            if e.node == self.end:
                 return e.cost
-            for n in self.neighbors(e.dst):
+            for n in self.neighbors(e.node):
                 if n in visited:
                     continue
-                q.put(QEntry(cost=e.cost+self.level(n), src=e.dst, dst=n))
+                visited.add(n)
+                q.put(QEntry(cost=e.cost+self.level(n), node=n))
         raise ValueError("no path found")
 
 def expand(data):
