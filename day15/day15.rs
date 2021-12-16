@@ -1,19 +1,12 @@
 use std::collections::{BinaryHeap, HashSet};
-use std::fs::File;
-use std::io::{BufRead, BufReader};
 
 use array2d::Array2D;
-use clap::{App, Arg};
 use simple_error::SimpleError;
 
 type Error = Box<dyn std::error::Error>;
 
 fn main() -> Result<(), Error> {
-    let matches = App::new("day15")
-        .arg(Arg::with_name("file").index(1).required(true))
-        .get_matches();
-
-    let grid = parse(matches.value_of("file").unwrap())?;
+    let grid = parse();
     let large_grid = expand(&grid);
 
     let graph = Graph::new(grid);
@@ -27,26 +20,22 @@ fn main() -> Result<(), Error> {
     Ok(())
 }
 
-fn parse(name: &str) -> Result<Array2D<u8>, Error> {
-    let lines = BufReader::new(File::open(name)?)
-        .lines()
-        .collect::<Result<Vec<String>, _>>()?;
-    let rows = lines.len();
-    if rows == 0 {
-        return Err(Box::new(SimpleError::new("empty file")));
-    }
-    let cols = lines[0].len();
-    if cols == 0 {
-        return Err(Box::new(SimpleError::new("empty lines")));
-    }
-    let mut grid = Array2D::filled_with(0u8, rows, cols);
-    for r in 0..rows {
-        for c in 0..cols {
-            let v = lines[r][c..c + 1].parse::<u8>()?;
-            grid[(r, c)] = v;
-        }
-    }
-    Ok(grid)
+fn parse() -> Array2D<u8> {
+    let input = include_str!("input.txt").trim_end();
+    let cols = input.find("\n").unwrap();
+    let rows = input.len() / cols;
+    Array2D::from_iter_row_major(
+        input.bytes().filter_map(|b| {
+            let b = b.wrapping_sub('0' as u8);
+            if b < 10 {
+                Some(b)
+            } else {
+                None
+            }
+        }),
+        rows,
+        cols,
+    )
 }
 
 fn expand(grid: &Array2D<u8>) -> Array2D<u8> {
