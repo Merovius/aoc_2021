@@ -34,6 +34,26 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			"8A004A801A8002F478",
+			Operator{
+				Ver: 4,
+				ID:  2,
+				Sub: []Packet{
+					Operator{
+						Ver: 1,
+						ID:  2,
+						Sub: []Packet{
+							Operator{
+								Ver: 5,
+								ID:  2,
+								Sub: []Packet{Literal{Ver: 6, Val: 15}},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tc := range tcs {
 		p, err := ParsePacket(tc.input)
@@ -49,7 +69,7 @@ func TestParse(t *testing.T) {
 func TestVersionSum(t *testing.T) {
 	tcs := []struct {
 		input string
-		want  uint64
+		want  int
 	}{
 		{"8A004A801A8002F478", 16},
 		{"620080001611562C8802118E34", 12},
@@ -70,7 +90,7 @@ func TestVersionSum(t *testing.T) {
 func TestEval(t *testing.T) {
 	tcs := []struct {
 		input string
-		want  uint64
+		want  int
 	}{
 		{"C200B40A82", 3},
 		{"04005AC33890", 54},
@@ -88,7 +108,7 @@ func TestEval(t *testing.T) {
 		}
 		got := p.Eval()
 		if got != tc.want {
-			t.Log(p)
+			t.Logf("Packet expression: %v", p.Expr())
 			t.Fatalf("Eval(%q) = %v, want %v", tc.input, got, tc.want)
 		}
 	}
