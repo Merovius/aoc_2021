@@ -8,7 +8,7 @@ def read(name):
 
 data = read('input.txt')
 
-Edge = namedtuple("Edge", ["weight", "src", "dst"])
+QEntry = namedtuple("QEntry", ["cost", "src", "dst"])
 
 class Graph:
     def __init__(self, nodes):
@@ -21,12 +21,6 @@ class Graph:
     def level(self, n):
         return self._nodes[n[0]][n[1]]
 
-    @property
-    def nodes(self):
-        for row in range(self._rows):
-            for col in range(self._cols):
-                yield (row, col)
-
     def neighbors(self, n):
         if n[0] > 0:
             yield(n[0]-1, n[1])
@@ -37,37 +31,26 @@ class Graph:
         if n[1] < self._cols-1:
             yield(n[0], n[1]+1)
 
-    def edges(self, n):
-        return [Edge(self.level(m), n, m) for m in self.neighbors(n)]
-
-    def shortest_path(self):
+    def shortest_path_cost(self):
         # implements Dijkstra's Algorithm
         q = PriorityQueue()
-        visited = dict()
-        for n in self.nodes:
-            if n == self.start:
-                q.put(Edge(0, None, n))
-            else:
-                q.put(Edge(math.inf, None, n))
+        # we are only interested in the cost, not the actual path, so we don't
+        # store where we visited a node *from*.
+        visited = set()
+
+        q.put(QEntry(cost=0, src=None, dst=self.start))
         while not q.empty():
             e = q.get()
             if e.dst in visited:
                 continue
-            visited[e.dst] = e.src
+            visited.add(e.dst)
             if e.dst == self.end:
-                break
-            for ne in self.edges(e.dst):
-                if ne.dst in visited:
+                return e.cost
+            for n in self.neighbors(e.dst):
+                if n in visited:
                     continue
-                q.put(Edge(ne.weight+e.weight, e.dst, ne.dst))
-        path = []
-        n = self.end
-        while n is not None:
-            path.append((n, self.level(n)))
-            n = visited[n]
-        path.reverse()
-        # remove start element from path. Crude hack, but okay
-        return path[1:]
+                q.put(QEntry(cost=e.cost+self.level(n), src=e.dst, dst=n))
+        raise ValueError("no path found")
 
 def expand(data):
     out = []
@@ -84,9 +67,7 @@ def expand(data):
     return out
 
 g = Graph(data)
-path = g.shortest_path()
-print(f"Shortest path has total risk {sum(v[1] for v in path)}")
+print(f"Shortest path has total risk {g.shortest_path_cost()}")
 data = expand(data)
 g = Graph(data)
-path = g.shortest_path()
-print(f"Shortest path in full cave has total risk {sum(v[1] for v in path)}")
+print(f"Shortest path in full cave has total risk {g.shortest_path_cost()}")
