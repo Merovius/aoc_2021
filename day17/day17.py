@@ -35,7 +35,7 @@ class Probe:
 
     def step(self):
         self.pos = (self.pos[0]+self.v[0], self.pos[1]+self.v[1])
-        self.v = (self.v[0]-sign(self.v[0]), self.v[1]-1)
+        self.v = (max(0, self.v[0]-1), self.v[1]-1)
         self.maxy = max(self.maxy, self.pos[1])
 
         x, y = self.target

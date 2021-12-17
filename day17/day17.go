@@ -40,8 +40,6 @@ func Shoot(vx, vy int) (highest int, hit bool) {
 		y += vy
 		if vx > 0 {
 			vx -= 1
-		} else if vx < 0 {
-			vx += 1
 		}
 		vy -= 1
 
