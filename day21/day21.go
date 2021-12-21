@@ -1,5 +1,7 @@
 // Solves only part 2
 
+//go:build ignore
+
 package main
 
 import (
