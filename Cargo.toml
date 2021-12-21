@@ -10,6 +10,8 @@ array2d = "0.2.1"
 bitvec = "0.22.3"
 clap = "2.34.0"
 hex = "0.4.3"
+serde = { version = "1.0.132", features = ["derive"] }
+serde_json = "1.0.73"
 simple-error = "0.2.3"
 
 [[bin]]
@@ -51,3 +53,7 @@ path = "day15/day15.rs"
 [[bin]]
 name = "day16"
 path = "day16/day16.rs"
+
+[[bin]]
+name = "day18"
+path = "day18/day18.rs"
