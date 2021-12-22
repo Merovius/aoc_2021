@@ -57,12 +57,13 @@ class Cuboid:
             if not c.empty():
                 yield c
 
+        # See intersection.svg/png
         yield from maybe(self.x.min, self.x.max, self.y.min, self.y.max, self.z.min, c.z.min)
         yield from maybe(self.x.min, self.x.max, self.y.min, c.y.min, c.z.min, c.z.max)
         yield from maybe(self.x.min, c.x.min, c.y.min, c.y.max, c.z.min, c.z.max)
-        yield from maybe(c.x.max, self.x.max, c.y.min, c.y.max, c.z.min, c.z.max)
-        yield from maybe(self.x.min, self.x.max, c.y.max, self.y.max, c.z.min, c.z.max)
         yield from maybe(self.x.min, self.x.max, self.y.min, self.y.max, c.z.max, self.z.max)
+        yield from maybe(self.x.min, self.x.max, c.y.max, self.y.max, c.z.min, c.z.max)
+        yield from maybe(c.x.max, self.x.max, c.y.min, c.y.max, c.z.min, c.z.max)
 
     def empty(self):
         return self.x.min >= self.x.max or self.y.min >= self.y.max or self.z.min >= self.z.max
@@ -91,7 +92,7 @@ def execute(steps):
         on = new
     return on
 
-on = execute([s for s in steps if not s.cuboid.intersect(init_region).empty()])
+on = execute(s for s in steps if not s.cuboid.intersect(init_region).empty())
 N = sum(c.size() for c in on)
 print(f"After initialization {N} cubes are on")
 
