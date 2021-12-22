@@ -50,41 +50,40 @@ class Cuboid:
     def difference(self, other):
         c = self.intersect(other)
         if c.empty():
-            return [self]
-        out = []
-        def add(xmin, xmax, ymin, ymax, zmin, zmax):
+            yield self
+            return
+        def maybe(xmin, xmax, ymin, ymax, zmin, zmax):
             c = Cuboid(Range(xmin, xmax), Range(ymin, ymax), Range(zmin, zmax))
             if not c.empty():
-                out.append(c)
+                yield c
 
-        add(self.x.min, c.x.min, self.y.min, c.y.min, self.z.min, c.z.min)
-        add(c.x.min, c.x.max, self.y.min, c.y.min, self.z.min, c.z.min)
-        add(c.x.max, self.x.max, self.y.min, c.y.min, self.z.min, c.z.min)
-        add(self.x.min, c.x.min, c.y.min, c.y.max, self.z.min, c.z.min)
-        add(c.x.min, c.x.max, c.y.min, c.y.max, self.z.min, c.z.min)
-        add(c.x.max, self.x.max, c.y.min, c.y.max, self.z.min, c.z.min)
-        add(self.x.min, c.x.min, c.y.max, self.y.max, self.z.min, c.z.min)
-        add(c.x.min, c.x.max, c.y.max, self.y.max, self.z.min, c.z.min)
-        add(c.x.max, self.x.max, c.y.max, self.y.max, self.z.min, c.z.min)
-        add(self.x.min, c.x.min, self.y.min, c.y.min, c.z.min, c.z.max)
-        add(c.x.min, c.x.max, self.y.min, c.y.min, c.z.min, c.z.max)
-        add(c.x.max, self.x.max, self.y.min, c.y.min, c.z.min, c.z.max)
-        add(self.x.min, c.x.min, c.y.min, c.y.max, c.z.min, c.z.max)
-        #add(c.x.min, c.x.max, c.y.min, c.y.max, c.z.min, c.z.max)
-        add(c.x.max, self.x.max, c.y.min, c.y.max, c.z.min, c.z.max)
-        add(self.x.min, c.x.min, c.y.max, self.y.max, c.z.min, c.z.max)
-        add(c.x.min, c.x.max, c.y.max, self.y.max, c.z.min, c.z.max)
-        add(c.x.max, self.x.max, c.y.max, self.y.max, c.z.min, c.z.max)
-        add(self.x.min, c.x.min, self.y.min, c.y.min, c.z.max, self.z.max)
-        add(c.x.min, c.x.max, self.y.min, c.y.min, c.z.max, self.z.max)
-        add(c.x.max, self.x.max, self.y.min, c.y.min, c.z.max, self.z.max)
-        add(self.x.min, c.x.min, c.y.min, c.y.max, c.z.max, self.z.max)
-        add(c.x.min, c.x.max, c.y.min, c.y.max, c.z.max, self.z.max)
-        add(c.x.max, self.x.max, c.y.min, c.y.max, c.z.max, self.z.max)
-        add(self.x.min, c.x.min, c.y.max, self.y.max, c.z.max, self.z.max)
-        add(c.x.min, c.x.max, c.y.max, self.y.max, c.z.max, self.z.max)
-        add(c.x.max, self.x.max, c.y.max, self.y.max, c.z.max, self.z.max)
-        return out
+        yield from maybe(self.x.min, c.x.min, self.y.min, c.y.min, self.z.min, c.z.min)
+        yield from maybe(c.x.min, c.x.max, self.y.min, c.y.min, self.z.min, c.z.min)
+        yield from maybe(c.x.max, self.x.max, self.y.min, c.y.min, self.z.min, c.z.min)
+        yield from maybe(self.x.min, c.x.min, c.y.min, c.y.max, self.z.min, c.z.min)
+        yield from maybe(c.x.min, c.x.max, c.y.min, c.y.max, self.z.min, c.z.min)
+        yield from maybe(c.x.max, self.x.max, c.y.min, c.y.max, self.z.min, c.z.min)
+        yield from maybe(self.x.min, c.x.min, c.y.max, self.y.max, self.z.min, c.z.min)
+        yield from maybe(c.x.min, c.x.max, c.y.max, self.y.max, self.z.min, c.z.min)
+        yield from maybe(c.x.max, self.x.max, c.y.max, self.y.max, self.z.min, c.z.min)
+        yield from maybe(self.x.min, c.x.min, self.y.min, c.y.min, c.z.min, c.z.max)
+        yield from maybe(c.x.min, c.x.max, self.y.min, c.y.min, c.z.min, c.z.max)
+        yield from maybe(c.x.max, self.x.max, self.y.min, c.y.min, c.z.min, c.z.max)
+        yield from maybe(self.x.min, c.x.min, c.y.min, c.y.max, c.z.min, c.z.max)
+        #yield from maybe(c.x.min, c.x.max, c.y.min, c.y.max, c.z.min, c.z.max)
+        yield from maybe(c.x.max, self.x.max, c.y.min, c.y.max, c.z.min, c.z.max)
+        yield from maybe(self.x.min, c.x.min, c.y.max, self.y.max, c.z.min, c.z.max)
+        yield from maybe(c.x.min, c.x.max, c.y.max, self.y.max, c.z.min, c.z.max)
+        yield from maybe(c.x.max, self.x.max, c.y.max, self.y.max, c.z.min, c.z.max)
+        yield from maybe(self.x.min, c.x.min, self.y.min, c.y.min, c.z.max, self.z.max)
+        yield from maybe(c.x.min, c.x.max, self.y.min, c.y.min, c.z.max, self.z.max)
+        yield from maybe(c.x.max, self.x.max, self.y.min, c.y.min, c.z.max, self.z.max)
+        yield from maybe(self.x.min, c.x.min, c.y.min, c.y.max, c.z.max, self.z.max)
+        yield from maybe(c.x.min, c.x.max, c.y.min, c.y.max, c.z.max, self.z.max)
+        yield from maybe(c.x.max, self.x.max, c.y.min, c.y.max, c.z.max, self.z.max)
+        yield from maybe(self.x.min, c.x.min, c.y.max, self.y.max, c.z.max, self.z.max)
+        yield from maybe(c.x.min, c.x.max, c.y.max, self.y.max, c.z.max, self.z.max)
+        yield from maybe(c.x.max, self.x.max, c.y.max, self.y.max, c.z.max, self.z.max)
 
     def empty(self):
         return self.x.min >= self.x.max or self.y.min >= self.y.max or self.z.min >= self.z.max
