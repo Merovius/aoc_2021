@@ -57,7 +57,7 @@ class Cuboid:
             if not c.empty():
                 yield c
 
-        # See intersection.svg/png
+        # See difference.svg/png
         yield from maybe(self.x.min, self.x.max, self.y.min, self.y.max, self.z.min, c.z.min)
         yield from maybe(self.x.min, self.x.max, self.y.min, c.y.min, c.z.min, c.z.max)
         yield from maybe(self.x.min, c.x.min, c.y.min, c.y.max, c.z.min, c.z.max)
